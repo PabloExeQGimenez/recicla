@@ -5,7 +5,7 @@ services:
     plan: free
     dockerfilePath: ./apps/api/Dockerfile
     dockerContext: .
-    preDeployCommand: cd apps/api && npx prisma migrate deploy
+    dockerCommand: sh -c "cd apps/api && npx prisma migrate deploy && node dist/src/main"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
