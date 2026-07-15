@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test -w apps/frontend
+
+  test-api:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: recicla_test
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma migrate deploy
+        working-directory: apps/api
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/recicla_test
+      - run: npm run test -w apps/api
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/recicla_test
+          JWT_SECRET: test-secret
+          JWT_EXPIRES_IN: 2h

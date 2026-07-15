@@ -23,5 +23,6 @@
     "noUncheckedSideEffectImports": true,
     "types": ["vitest/globals"]
   },
-  "include": ["src" , "types", ".env.d.ts"]
+  "include": ["src", "types", ".env.d.ts"],
+  "exclude": ["src/**/*.spec.ts", "src/**/*.spec.tsx"]
 }

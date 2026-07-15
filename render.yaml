@@ -1,0 +1,40 @@
+services:
+  - type: web
+    name: recicla-api
+    runtime: docker
+    dockerfilePath: ./apps/api/Dockerfile
+    dockerContext: .
+    preDeployCommand: cd apps/api && npx prisma migrate deploy
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: recicla-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 2h
+      - key: PORT
+        value: 3000
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: CORS_ORIGIN
+        value: https://recicla-frontend.onrender.com
+
+  - type: static
+    name: recicla-frontend
+    runtime: static
+    buildCommand: npm run build -w apps/frontend
+    staticPublishPath: ./apps/frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+databases:
+  - name: recicla-db
+    plan: free
+    databaseName: recicla
+    ipAllowList: []

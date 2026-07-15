@@ -146,41 +146,6 @@ const PesajeCreatePage = () => {
     };
   }, [shortcutsOpen]);
 
-  useEffect(() => {
-    if (!shortcutsOpen) return;
-
-    const anchor = shortcutsAnchorRef.current;
-    if (!anchor) return;
-
-    const compute = () => {
-      const r = anchor.getBoundingClientRect();
-      const popW = 360;
-
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-
-      let left = Math.min(r.left, vw - popW - 20);
-      left = Math.max(12, left);
-
-      const maxHeight = Math.min(520, vh - 24);
-      const estimatedH = Math.min(420, maxHeight);
-
-      let top = r.top - estimatedH - 10;
-      if (top < 12) top = r.bottom + 10;
-
-      setShortcutsPos({ top, left });
-    };
-
-    compute();
-    window.addEventListener("resize", compute);
-    window.addEventListener("scroll", compute, true);
-
-    return () => {
-      window.removeEventListener("resize", compute);
-      window.removeEventListener("scroll", compute, true);
-    };
-  }, [shortcutsOpen]);
-
   const subtotal = (() => {
     const mat = materiales.find((m) => m.id === lineMaterialId);
     const precio = mat?.precio ?? 0;
