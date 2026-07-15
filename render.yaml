@@ -27,7 +27,6 @@ services:
   - type: web
     name: recicla-frontend
     runtime: static
-    plan: free
     buildCommand: npm run build -w apps/frontend
     staticPublishPath: ./apps/frontend/dist
     routes:
