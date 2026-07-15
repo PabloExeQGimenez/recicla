@@ -23,7 +23,7 @@ services:
       - key: CORS_ORIGIN
         value: https://recicla-frontend.onrender.com
 
-  - type: static
+  - type: web
     name: recicla-frontend
     runtime: static
     buildCommand: npm run build -w apps/frontend
