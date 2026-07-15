@@ -4,6 +4,7 @@ import {
   Body,
   Get,
   Delete,
+  Patch,
   Param,
   UseGuards,
   Request,
@@ -15,6 +16,8 @@ import {
   type LoginDTO,
   registerSchema,
   type RegisterDTO,
+  resetPasswordSchema,
+  type ResetPasswordDTO,
 } from './dto/auth.dto';
 import { JwtAuthGuard } from '../infrastructure/guards/jwt-auth.guard';
 import { RolesGuard } from '../infrastructure/guards/roles.guard';
@@ -81,5 +84,17 @@ export class AuthController {
     @Request() req: { user: { id: string; role: string } },
   ) {
     return this.authService.delete(id, req.user);
+  }
+
+  @Patch('users/:id/reset-password')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  async resetPassword(
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(resetPasswordSchema))
+    body: ResetPasswordDTO,
+    @Request() req: { user: { id: string; role: string } },
+  ) {
+    return this.authService.resetPassword(id, body.password, req.user);
   }
 }

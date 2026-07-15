@@ -14,6 +14,10 @@ interface CreateUserResponse {
   };
 }
 
+interface ResetPasswordResponse {
+  message: string;
+}
+
 export const usuariosService = {
   async getAll(): Promise<Usuario[]> {
     return apiFetch<Usuario[]>("/auth/users");
@@ -32,5 +36,12 @@ export const usuariosService = {
 
   async delete(id: string): Promise<void> {
     return apiFetch<void>(`/auth/users/${id}`, { method: "DELETE" });
+  },
+
+  async resetPassword(id: string, password: string): Promise<ResetPasswordResponse> {
+    return apiFetch<ResetPasswordResponse>(`/auth/users/${id}/reset-password`, {
+      method: "PATCH",
+      body: JSON.stringify({ password }),
+    });
   },
 };

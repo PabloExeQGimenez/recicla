@@ -149,3 +149,122 @@ export const PermissionChip = styled.span<{ $allowed: boolean }>`
     text-decoration: line-through;
   `}
 `;
+
+export const ModalBackdrop = styled.div<{ $isOpen: boolean }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
+  visibility: ${({ $isOpen }) => ($isOpen ? "visible" : "hidden")};
+  transition:
+    opacity ${({ theme }) => theme.motion.normal},
+    visibility ${({ theme }) => theme.motion.normal};
+`;
+
+export const ModalContainer = styled.div<{ $isOpen: boolean }>`
+  display: flex;
+  flex-direction: column;
+  background: ${({ theme }) => theme.colors.surface.card};
+  padding: ${({ theme }) => theme.spacing(3)};
+  border-radius: ${({ theme }) => theme.radius.md};
+  min-width: 350px;
+  max-width: 400px;
+  box-shadow: ${({ theme }) => theme.shadows.lg};
+  transform: ${({ $isOpen }) => ($isOpen ? "scale(1)" : "scale(0.95)")};
+  opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
+  transition:
+    transform ${({ theme }) => theme.motion.normal},
+    opacity ${({ theme }) => theme.motion.normal};
+`;
+
+export const ModalTitle = styled.h3`
+  margin: 0 0 ${({ theme }) => theme.spacing(1)} 0;
+  font-size: ${({ theme }) => theme.fontSizes.lg};
+  font-weight: ${({ theme }) => theme.fontWeights.semibold};
+  text-align: center;
+`;
+
+export const ModalMessage = styled.p`
+  margin: 0 0 ${({ theme }) => theme.spacing(2)} 0;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  line-height: 1.5;
+  text-align: center;
+`;
+
+export const ModalInput = styled.input`
+  width: 100%;
+  padding: ${({ theme }) => theme.spacing(1.25)};
+  border-radius: ${({ theme }) => theme.radius.md};
+  border: 1px solid ${({ theme }) => theme.colors.border.default};
+  background: ${({ theme }) => theme.colors.surface.card};
+  color: ${({ theme }) => theme.colors.text.primary};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  font-family: inherit;
+  outline: none;
+  transition: border-color ${({ theme }) => theme.motion.normal};
+  box-sizing: border-box;
+
+  &:focus {
+    border-color: ${({ theme }) => theme.colors.brand.secondary};
+  }
+
+  &::placeholder {
+    color: ${({ theme }) => theme.colors.text.muted};
+  }
+`;
+
+export const ModalError = styled.p`
+  margin: ${({ theme }) => theme.spacing(1)} 0 0 0;
+  color: ${({ theme }) => theme.colors.state.danger};
+  font-size: ${({ theme }) => theme.fontSizes.xs};
+  text-align: center;
+`;
+
+export const ModalButtonGroup = styled.div`
+  display: flex;
+  gap: ${({ theme }) => theme.spacing(2)};
+  margin-top: ${({ theme }) => theme.spacing(2.5)};
+  width: 100%;
+`;
+
+export const ModalButton = styled.button<{ $variant?: "primary" | "secondary" }>`
+  flex: 1;
+  height: 38px;
+  border-radius: ${({ theme }) => theme.radius.md};
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: ${({ theme }) => theme.motion.normal};
+  font-size: ${({ theme }) => theme.fontSizes.sm};
+  font-weight: ${({ theme }) => theme.fontWeights.medium};
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  ${({ $variant, theme }) =>
+    $variant === "secondary"
+      ? `
+    background: ${theme.colors.surface.card};
+    border-color: ${theme.colors.border.default};
+    color: ${theme.colors.text.primary};
+    &:hover { box-shadow: ${theme.shadows.sm}; }
+  `
+      : `
+    background: ${theme.colors.state.success};
+    color: ${theme.colors.text.inverse};
+    &:hover { box-shadow: ${theme.shadows.sm}; filter: brightness(0.95); }
+  `}
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;

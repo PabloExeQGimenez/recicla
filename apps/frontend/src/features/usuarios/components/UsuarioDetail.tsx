@@ -9,7 +9,7 @@ import InfoRow from "../../../shared/UI/InfoRow";
 import { StatusBadge } from "../../../shared/UI";
 import { ConfirmDialog } from "../../../shared/UI/ConfirmDialog";
 import { formatDate, safe } from "../../../shared/utils/formatters";
-import { FaUser, FaShieldHalved, FaDatabase, FaTrash } from "react-icons/fa6";
+import { FaUser, FaShieldHalved, FaDatabase, FaTrash, FaKey } from "react-icons/fa6";
 import {
   Header,
   Profile,
@@ -24,6 +24,14 @@ import {
   ErrorBanner,
   ChipGrid,
   PermissionChip,
+  ModalBackdrop,
+  ModalContainer,
+  ModalTitle,
+  ModalMessage,
+  ModalInput,
+  ModalError,
+  ModalButtonGroup,
+  ModalButton,
 } from "./UsuarioDetailStyles";
 
 const ROLE_PERMISSIONS: Record<string, { label: string; allowed: boolean }[]> = {
@@ -76,6 +84,12 @@ const UsuarioDetail = () => {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
+  const [resetOpen, setResetOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [resetting, setResetting] = useState(false);
+  const [resetError, setResetError] = useState<string | null>(null);
+  const [resetSuccess, setResetSuccess] = useState(false);
+
   const handleConfirmDelete = async () => {
     if (!data?.id) return;
     setDeleting(true);
@@ -90,6 +104,35 @@ const UsuarioDetail = () => {
       setDeleting(false);
       setConfirmOpen(false);
     }
+  };
+
+  const handleResetPassword = async () => {
+    if (!data?.id || !newPassword.trim()) return;
+    setResetting(true);
+    setResetError(null);
+    setResetSuccess(false);
+    try {
+      await usuariosService.resetPassword(data.id, newPassword.trim());
+      setResetSuccess(true);
+      setNewPassword("");
+      setTimeout(() => {
+        setResetOpen(false);
+        setResetSuccess(false);
+      }, 1500);
+    } catch (err) {
+      if (err instanceof Error) setResetError(err.message);
+      else setResetError("No se pudo restablecer la contraseña");
+    } finally {
+      setResetting(false);
+    }
+  };
+
+  const handleCloseResetModal = () => {
+    if (resetting) return;
+    setResetOpen(false);
+    setNewPassword("");
+    setResetError(null);
+    setResetSuccess(false);
   };
 
   if (!data && !loading && !error) {
@@ -129,6 +172,15 @@ const UsuarioDetail = () => {
           >
             Volver
           </ActionGhost>
+
+          {user?.id !== data.id && (
+            <ActionSolid
+              type="button"
+              onClick={() => setResetOpen(true)}
+            >
+              <FaKey size={13} /> Restablecer contraseña
+            </ActionSolid>
+          )}
 
           {user?.id !== data.id && (
             <ActionSolid
@@ -191,6 +243,50 @@ const UsuarioDetail = () => {
         onCancel={() => setConfirmOpen(false)}
         isLoading={deleting}
       />
+
+      {resetOpen && (
+        <ModalBackdrop $isOpen={resetOpen} onClick={handleCloseResetModal}>
+          <ModalContainer $isOpen={resetOpen} onClick={(e) => e.stopPropagation()}>
+            <ModalTitle>Restablecer contraseña</ModalTitle>
+            <ModalMessage>
+              Ingresá la nueva contraseña para <strong>{safe(data.name)} {safe(data.lastName)}</strong>
+            </ModalMessage>
+
+            <ModalInput
+              type="password"
+              placeholder="Nueva contraseña (mín. 6 caracteres)"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleResetPassword();
+              }}
+              disabled={resetting || resetSuccess}
+              autoFocus
+            />
+
+            {resetError && <ModalError>{resetError}</ModalError>}
+            {resetSuccess && <ModalError style={{ color: "#16A34A" }}>Contraseña actualizada correctamente</ModalError>}
+
+            <ModalButtonGroup>
+              <ModalButton
+                $variant="secondary"
+                type="button"
+                onClick={handleCloseResetModal}
+                disabled={resetting}
+              >
+                Cancelar
+              </ModalButton>
+              <ModalButton
+                type="button"
+                onClick={handleResetPassword}
+                disabled={resetting || resetSuccess || !newPassword.trim() || newPassword.trim().length < 6}
+              >
+                {resetting ? "Guardando..." : "Guardar"}
+              </ModalButton>
+            </ModalButtonGroup>
+          </ModalContainer>
+        </ModalBackdrop>
+      )}
     </>
   );
 };

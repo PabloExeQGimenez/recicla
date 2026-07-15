@@ -3,6 +3,7 @@ import {
   UnauthorizedException,
   ConflictException,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../../shared/database/prisma.service';
@@ -210,5 +211,32 @@ export class AuthService {
     }
 
     await this.prisma.user.delete({ where: { id } });
+  }
+
+  async resetPassword(
+    id: string,
+    newPassword: string,
+    currentUser: { id: string; role: string },
+  ) {
+    if (currentUser.role !== 'ADMIN') {
+      throw new UnauthorizedException(
+        'No tenés permiso para restablecer contraseñas',
+      );
+    }
+
+    const user = await this.prisma.user.findUnique({ where: { id } });
+
+    if (!user) {
+      throw new NotFoundException('Usuario no encontrado');
+    }
+
+    const hashedPassword = await this.bcryptService.hash(newPassword);
+
+    await this.prisma.user.update({
+      where: { id },
+      data: { password: hashedPassword },
+    });
+
+    return { message: 'Contraseña restablecida correctamente' };
   }
 }

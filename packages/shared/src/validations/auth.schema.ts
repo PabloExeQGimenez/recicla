@@ -17,3 +17,9 @@ export const loginSchema = z.object({
 });
 
 export type LoginSchema = z.infer<typeof loginSchema>;
+
+export const resetPasswordSchema = z.object({
+  password: z.string().min(6, 'La contraseña debe tener al menos 6 caracteres'),
+});
+
+export type ResetPasswordSchema = z.infer<typeof resetPasswordSchema>;
