@@ -110,9 +110,15 @@ describe('apiFetchBlob', () => {
 
   it('returns blob on success', async () => {
     const blob = new Blob(['file content'], { type: 'application/pdf' })
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(blob, { status: 200 })
-    )
+    const mockResponse = {
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      headers: new Headers(),
+      blob: () => Promise.resolve(blob),
+    } as unknown as Response
+
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(mockResponse)
 
     const result = await apiFetchBlob('/export')
 
