@@ -1,4 +1,4 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, Logger } from '@nestjs/common';
 import { Recuperador } from '../domain/recuperador.entity';
 import {
   RECUPERADOR_REPOSITORY,
@@ -7,6 +7,8 @@ import {
 
 @Injectable()
 export class DeactivateRecuperadorUseCase {
+  private readonly logger = new Logger(DeactivateRecuperadorUseCase.name);
+
   constructor(
     @Inject(RECUPERADOR_REPOSITORY)
     private readonly recuperadorRepository: RecuperadorRepository,
@@ -19,6 +21,8 @@ export class DeactivateRecuperadorUseCase {
     }
     recuperador.deactivate();
     await this.recuperadorRepository.update(recuperador);
+
+    this.logger.log(`Recuperador desactivado: ${id}`);
 
     return recuperador;
   }

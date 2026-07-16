@@ -1,6 +1,7 @@
 export { default as Button } from "./Button";
 export { default as Container } from "./Container";
 export { EmptyTableMessage } from "./EmptyTableMessage";
+export { default as ErrorPage } from "./ErrorPage";
 export { default as FormField } from "./FormField";
 export { default as InfoCard } from "./InfoCard";
 export { default as InfoGrid } from "./InfoGrid";

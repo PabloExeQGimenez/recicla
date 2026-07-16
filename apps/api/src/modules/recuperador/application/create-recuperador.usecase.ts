@@ -1,4 +1,4 @@
-import { ConflictException, Inject, Injectable } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, Logger } from '@nestjs/common';
 import { Recuperador } from '../domain/recuperador.entity';
 import {
   RECUPERADOR_REPOSITORY,
@@ -8,6 +8,8 @@ import type { CreateRecuperadorDTO } from '../presentation/schemas/create-recupe
 
 @Injectable()
 export class CreateRecuperadorUseCase {
+  private readonly logger = new Logger(CreateRecuperadorUseCase.name);
+
   constructor(
     @Inject(RECUPERADOR_REPOSITORY)
     private readonly recuperadorRepository: RecuperadorRepository,
@@ -41,6 +43,11 @@ export class CreateRecuperadorUseCase {
     });
 
     await this.recuperadorRepository.save(recuperador);
+
+    this.logger.log(
+      `Recuperador creado: ${data.name} ${data.lastName} (DNI: ${data.dni})`,
+    );
+
     return recuperador;
   }
 }

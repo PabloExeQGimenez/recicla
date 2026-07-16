@@ -1,4 +1,4 @@
-import { Injectable, Inject, ConflictException } from '@nestjs/common';
+import { Injectable, Inject, ConflictException, Logger } from '@nestjs/common';
 import { Material } from '../domain/material.entity';
 import {
   MATERIAL_REPOSITORY,
@@ -8,6 +8,8 @@ import { CreateMaterialDTO } from '../presentation/schemas/create-material.schem
 
 @Injectable()
 export class CreateMaterialUseCase {
+  private readonly logger = new Logger(CreateMaterialUseCase.name);
+
   constructor(
     @Inject(MATERIAL_REPOSITORY)
     private readonly materialRepository: MaterialRepository,
@@ -29,6 +31,10 @@ export class CreateMaterialUseCase {
     });
 
     await this.materialRepository.save(material);
+
+    this.logger.log(
+      `Material creado: ${data.name} (precio: ${data.currentPrice})`,
+    );
 
     return material;
   }

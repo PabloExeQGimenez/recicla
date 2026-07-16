@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import {
   Recuperador,
@@ -15,6 +16,8 @@ import {
 
 @Injectable()
 export class UpdateRecuperadorUseCase {
+  private readonly logger = new Logger(UpdateRecuperadorUseCase.name);
+
   constructor(
     @Inject(RECUPERADOR_REPOSITORY)
     private readonly recuperadorRepository: RecuperadorRepository,
@@ -38,6 +41,8 @@ export class UpdateRecuperadorUseCase {
 
     recuperador.update(data);
     await this.recuperadorRepository.update(recuperador);
+
+    this.logger.log(`Recuperador actualizado: ${id}`);
 
     return recuperador;
   }

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_FILTER } from '@nestjs/core';
 import { RecuperadorModule } from './modules/recuperador/recuperador.module';
 import { PrismaModule } from './shared/database/prisma.module';
 import { MaterialModule } from './modules/material/material.module';
@@ -11,9 +11,17 @@ import { JwtAuthGuard } from './modules/auth/infrastructure/guards/jwt-auth.guar
 import { RolesGuard } from './modules/auth/infrastructure/guards/roles.guard';
 import { ConfigModule } from '@nestjs/config';
 import { validate } from './config/env.validation';
+import { ThrottlerModule, ThrottlerGuard, seconds } from '@nestjs/throttler';
+import { AllExceptionsFilter } from './shared/filters/all-exceptions.filter';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: seconds(60),
+        limit: 10,
+      },
+    ]),
     PrismaModule,
     AuthModule,
     RecuperadorModule,
@@ -28,6 +36,14 @@ import { validate } from './config/env.validation';
   ],
   controllers: [],
   providers: [
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,

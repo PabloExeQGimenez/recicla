@@ -1,4 +1,9 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import {
   SOLICITUD_PAGO_REPOSITORY,
   type SolicitudPagoRepository,
@@ -13,6 +18,8 @@ import { SolicitudPagoStatus } from '../domain/solicitud-pago-status.enum';
 
 @Injectable()
 export class CreateSolicitudPagoUseCase {
+  private readonly logger = new Logger(CreateSolicitudPagoUseCase.name);
+
   constructor(
     @Inject(SOLICITUD_PAGO_REPOSITORY)
     private readonly solicitudPagoRepository: SolicitudPagoRepository,
@@ -49,6 +56,11 @@ export class CreateSolicitudPagoUseCase {
       pesajeIds,
       solicitudPago.id,
     );
+
+    this.logger.log(
+      `Solicitud de pago creada: ${solicitudPago.id} (${pesajesAIncluir.length} pesajes)`,
+    );
+
     return solicitudPago;
   }
 }

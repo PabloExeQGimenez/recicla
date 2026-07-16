@@ -3,6 +3,7 @@ import {
   Inject,
   NotFoundException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import {
   type PesajeRepository,
@@ -11,6 +12,8 @@ import {
 
 @Injectable()
 export class DeletePesajeUseCase {
+  private readonly logger = new Logger(DeletePesajeUseCase.name);
+
   constructor(
     @Inject(PESAJE_REPOSITORY)
     private readonly pesajeRepository: PesajeRepository,
@@ -27,5 +30,7 @@ export class DeletePesajeUseCase {
       );
     }
     await this.pesajeRepository.delete(id);
+
+    this.logger.log(`Pesaje eliminado: ${id}`);
   }
 }

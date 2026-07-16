@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, Logger } from '@nestjs/common';
 import {
   MATERIAL_REPOSITORY,
   type MaterialRepository,
@@ -7,6 +7,8 @@ import { Material } from '../domain/material.entity';
 
 @Injectable()
 export class DeactivateMaterialUseCase {
+  private readonly logger = new Logger(DeactivateMaterialUseCase.name);
+
   constructor(
     @Inject(MATERIAL_REPOSITORY)
     private readonly materialRepository: MaterialRepository,
@@ -20,6 +22,9 @@ export class DeactivateMaterialUseCase {
 
     material.deactivate();
     await this.materialRepository.update(material);
+
+    this.logger.log(`Material desactivado: ${id}`);
+
     return material;
   }
 }

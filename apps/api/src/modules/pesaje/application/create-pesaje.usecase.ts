@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import {
   PESAJE_REPOSITORY,
@@ -23,6 +24,8 @@ import { PesajeStatus } from '../domain/pesaje-status.enum';
 
 @Injectable()
 export class CreatePesajeUseCase {
+  private readonly logger = new Logger(CreatePesajeUseCase.name);
+
   constructor(
     @Inject(PESAJE_REPOSITORY)
     private readonly pesajeRepository: PesajeRepository,
@@ -68,6 +71,10 @@ export class CreatePesajeUseCase {
       updatedAt: new Date(),
     });
     await this.pesajeRepository.save(pesaje);
+
+    this.logger.log(
+      `Pesaje creado: ${pesaje.id} para recuperador ${data.recuperadorId} (${pesajeItems.length} materiales)`,
+    );
 
     return pesaje;
   }

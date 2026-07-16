@@ -3,6 +3,7 @@ import {
   Inject,
   NotFoundException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import {
   PESAJE_REPOSITORY,
@@ -16,6 +17,8 @@ import {
 
 @Injectable()
 export class DeleteSolicitudPagoUseCase {
+  private readonly logger = new Logger(DeleteSolicitudPagoUseCase.name);
+
   constructor(
     @Inject(SOLICITUD_PAGO_REPOSITORY)
     private readonly solicitudPagoRepository: SolicitudPagoRepository,
@@ -39,5 +42,7 @@ export class DeleteSolicitudPagoUseCase {
 
     await this.pesajeRepository.removeFromPaymentRequest(pesajeIds);
     await this.solicitudPagoRepository.delete(id);
+
+    this.logger.log(`Solicitud de pago eliminada: ${id}`);
   }
 }

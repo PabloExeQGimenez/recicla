@@ -4,6 +4,7 @@ import ProtectedRoute from "../shared/auth/ProtectedRoute";
 import RoleRoute from "../shared/auth/RoleRoute";
 import LoginPage from "../features/auth/pages/LoginPage";
 import ForbiddenPage from "../features/auth/pages/ForbiddenPage";
+import { ErrorPage } from "../shared/UI";
 import { DashboardPage } from "../features/dashboard";
 import {
   RecuperadorCreate,
@@ -28,10 +29,12 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+    errorElement: <ErrorPage />,
   },
   {
     path: "/403",
     element: <ForbiddenPage />,
+    errorElement: <ErrorPage />,
   },
   {
     element: <ProtectedRoute />,
@@ -39,6 +42,7 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <AppLayout />,
+        errorElement: <ErrorPage />,
         children: [
           { index: true, element: <DashboardPage /> },
           {

@@ -4,6 +4,7 @@ import {
   ConflictException,
   BadRequestException,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../../shared/database/prisma.service';
@@ -30,6 +31,8 @@ export interface AuthResponse {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
@@ -59,6 +62,8 @@ export class AuthService {
     };
 
     const token = this.jwtService.sign(payload);
+
+    this.logger.log(`Login exitoso: ${email}`);
 
     return {
       token,
@@ -119,6 +124,8 @@ export class AuthService {
     };
 
     const token = this.jwtService.sign(payload);
+
+    this.logger.log(`Registro exitoso: ${email} (${role})`);
 
     return {
       token,

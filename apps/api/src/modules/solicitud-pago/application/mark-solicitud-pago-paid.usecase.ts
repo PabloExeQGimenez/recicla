@@ -3,6 +3,7 @@ import {
   Inject,
   NotFoundException,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import {
   SOLICITUD_PAGO_REPOSITORY,
@@ -16,6 +17,8 @@ import {
 
 @Injectable()
 export class MarkSolicitudPagoPaidUseCase {
+  private readonly logger = new Logger(MarkSolicitudPagoPaidUseCase.name);
+
   constructor(
     @Inject(SOLICITUD_PAGO_REPOSITORY)
     private readonly solicitudPagoRepository: SolicitudPagoRepository,
@@ -58,6 +61,11 @@ export class MarkSolicitudPagoPaidUseCase {
     const pesajeIds = pesajesAPagar.map((pesaje) => pesaje.id);
     await this.pesajeRepository.markAsPaid(pesajeIds);
     await this.solicitudPagoRepository.update(solicitudPago);
+
+    this.logger.log(
+      `Solicitud de pago marcada como pagada: ${id} (${pesajesAPagar.length} pesajes)`,
+    );
+
     return solicitudPago;
   }
 }
