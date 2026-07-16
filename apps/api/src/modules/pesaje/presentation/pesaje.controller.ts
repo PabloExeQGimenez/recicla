@@ -34,7 +34,16 @@ import {
 } from './schemas/export-pesajes.schema';
 import { type PaginatedResponseDTO } from '../../../shared/dtos/paginated-response.dto';
 import { PaginateResponseMapper } from '../../../shared/mappers/paginated-response.mapper';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 
+@ApiTags('pesajes')
 @Controller('pesajes')
 export class PesajeController {
   constructor(
@@ -48,6 +57,35 @@ export class PesajeController {
   ) {}
 
   @Post()
+  @ApiOperation({
+    summary: 'Crear pesaje',
+    description: 'Registra un nuevo pesaje para un recuperador',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        recuperadorId: {
+          type: 'string',
+          example: 'uuid-del-recuperador',
+          description: 'ID del recuperador',
+        },
+        materiales: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              materialId: { type: 'string', example: 'uuid-del-material' },
+              weight: { type: 'number', example: 25.5 },
+            },
+          },
+        },
+      },
+      required: ['recuperadorId', 'materiales'],
+    },
+  })
+  @ApiResponse({ status: 201, description: 'Pesaje creado exitosamente' })
+  @ApiResponse({ status: 400, description: 'Datos inválidos' })
   async create(
     @Body(new ZodValidationPipe(CreatePesajeSchema))
     body: CreatePesajeDTO,
@@ -57,6 +95,11 @@ export class PesajeController {
   }
 
   @Get('export/excel')
+  @ApiOperation({
+    summary: 'Exportar pesajes a Excel',
+    description: 'Descarga un archivo .xlsx con los pesajes filtrados',
+  })
+  @ApiResponse({ status: 200, description: 'Archivo Excel generado' })
   async exportExcel(
     @Query(new ZodValidationPipe(ExportPesajesSchema))
     query: ExportPesajesDTO,
@@ -72,6 +115,11 @@ export class PesajeController {
   }
 
   @Get('export/pdf')
+  @ApiOperation({
+    summary: 'Exportar pesajes a PDF',
+    description: 'Descarga un archivo .pdf con los pesajes filtrados',
+  })
+  @ApiResponse({ status: 200, description: 'Archivo PDF generado' })
   async exportPdf(
     @Query(new ZodValidationPipe(ExportPesajesSchema))
     query: ExportPesajesDTO,
@@ -86,11 +134,25 @@ export class PesajeController {
   }
 
   @Delete('items/:itemId')
+  @ApiOperation({
+    summary: 'Eliminar ítem de pesaje',
+    description: 'Elimina un material específico dentro de un pesaje',
+  })
+  @ApiParam({ name: 'itemId', description: 'ID del ítem del pesaje' })
+  @ApiResponse({ status: 200, description: 'Ítem eliminado' })
+  @ApiResponse({ status: 404, description: 'Ítem no encontrado' })
   async deleteItem(@Param('itemId') itemId: string): Promise<void> {
     await this.deletePesajeItemUseCase.execute(itemId);
   }
 
   @Get(':id')
+  @ApiOperation({
+    summary: 'Obtener pesaje',
+    description: 'Retorna un pesaje por su ID',
+  })
+  @ApiParam({ name: 'id', description: 'ID del pesaje' })
+  @ApiResponse({ status: 200, description: 'Pesaje encontrado' })
+  @ApiResponse({ status: 404, description: 'Pesaje no encontrado' })
   async findById(
     @Param(new ZodValidationPipe(IdSchema))
     param: IdDTO,
@@ -100,6 +162,30 @@ export class PesajeController {
   }
 
   @Get()
+  @ApiOperation({
+    summary: 'Listar pesajes',
+    description: 'Retorna paginación de pesajes',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    example: 1,
+    description: 'Número de página',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    example: 10,
+    description: 'Resultados por página',
+  })
+  @ApiQuery({
+    name: 'recuperadorId',
+    required: false,
+    description: 'Filtrar por recuperador',
+  })
+  @ApiQuery({ name: 'from', required: false, description: 'Fecha desde (ISO)' })
+  @ApiQuery({ name: 'to', required: false, description: 'Fecha hasta (ISO)' })
+  @ApiResponse({ status: 200, description: 'Lista paginada de pesajes' })
   async findAll(
     @Query(new ZodValidationPipe(FindPesajesSchema))
     query: FindPesajeDTO,
@@ -111,6 +197,13 @@ export class PesajeController {
   }
 
   @Delete(':id')
+  @ApiOperation({
+    summary: 'Eliminar pesaje',
+    description: 'Elimina un pesaje por su ID',
+  })
+  @ApiParam({ name: 'id', description: 'ID del pesaje' })
+  @ApiResponse({ status: 200, description: 'Pesaje eliminado' })
+  @ApiResponse({ status: 404, description: 'Pesaje no encontrado' })
   async delete(
     @Param(new ZodValidationPipe(IdSchema))
     param: IdDTO,

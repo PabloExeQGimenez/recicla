@@ -32,7 +32,18 @@ import { ActivateMaterialUseCase } from '../application/activate-material.usecas
 import { DeactivateMaterialUseCase } from '../application/deactivate-material.usecase';
 import { Roles } from '../../auth/infrastructure/decorators/roles.decorator';
 import { RolesGuard } from '../../auth/infrastructure/guards/roles.guard';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 
+@ApiTags('materiales')
+@ApiBearerAuth()
 @Controller('materiales')
 export class MaterialController {
   constructor(
@@ -47,6 +58,30 @@ export class MaterialController {
   @Post()
   @UseGuards(RolesGuard)
   @Roles('ADMIN')
+  @ApiOperation({
+    summary: 'Crear material',
+    description: 'Crea un nuevo material (solo ADMIN)',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          example: 'Cartón',
+          description: 'Nombre del material',
+        },
+        currentPrice: {
+          type: 'number',
+          example: 150.5,
+          description: 'Precio actual por kg',
+        },
+      },
+      required: ['name', 'currentPrice'],
+    },
+  })
+  @ApiResponse({ status: 201, description: 'Material creado exitosamente' })
+  @ApiResponse({ status: 400, description: 'Datos inválidos' })
   async create(
     @Body(new ZodValidationPipe(createMaterialSchema))
     body: CreateMaterialDTO,
@@ -56,6 +91,13 @@ export class MaterialController {
   }
 
   @Get(':id')
+  @ApiOperation({
+    summary: 'Obtener material',
+    description: 'Retorna un material por su ID',
+  })
+  @ApiParam({ name: 'id', description: 'ID del material' })
+  @ApiResponse({ status: 200, description: 'Material encontrado' })
+  @ApiResponse({ status: 404, description: 'Material no encontrado' })
   async findById(
     @Param(new ZodValidationPipe(IdSchema))
     param: IdDTO,
@@ -65,6 +107,17 @@ export class MaterialController {
   }
 
   @Get()
+  @ApiOperation({
+    summary: 'Listar materiales',
+    description: 'Retorna todos los materiales',
+  })
+  @ApiQuery({
+    name: 'active',
+    required: false,
+    description: 'Filtrar por estado activo',
+    example: true,
+  })
+  @ApiResponse({ status: 200, description: 'Lista de materiales' })
   async findAll(
     @Query(new ZodValidationPipe(ActiveSchema))
     query: ActiveDTO,
@@ -76,6 +129,26 @@ export class MaterialController {
   @Patch(':id/price')
   @UseGuards(RolesGuard)
   @Roles('ADMIN')
+  @ApiOperation({
+    summary: 'Cambiar precio',
+    description: 'Actualiza el precio de un material (solo ADMIN)',
+  })
+  @ApiParam({ name: 'id', description: 'ID del material' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        newPrice: {
+          type: 'number',
+          example: 180.0,
+          description: 'Nuevo precio por kg',
+        },
+      },
+      required: ['newPrice'],
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Precio actualizado' })
+  @ApiResponse({ status: 404, description: 'Material no encontrado' })
   async changePrice(
     @Param(new ZodValidationPipe(IdSchema))
     param: IdDTO,
@@ -92,6 +165,13 @@ export class MaterialController {
   @Patch(':id/activate')
   @UseGuards(RolesGuard)
   @Roles('ADMIN')
+  @ApiOperation({
+    summary: 'Activar material',
+    description: 'Activa un material desactivado (solo ADMIN)',
+  })
+  @ApiParam({ name: 'id', description: 'ID del material' })
+  @ApiResponse({ status: 200, description: 'Material activado' })
+  @ApiResponse({ status: 404, description: 'Material no encontrado' })
   async activate(
     @Param(new ZodValidationPipe(IdSchema))
     param: IdDTO,
@@ -103,6 +183,13 @@ export class MaterialController {
   @Patch(':id/deactivate')
   @UseGuards(RolesGuard)
   @Roles('ADMIN')
+  @ApiOperation({
+    summary: 'Desactivar material',
+    description: 'Desactiva un material (solo ADMIN)',
+  })
+  @ApiParam({ name: 'id', description: 'ID del material' })
+  @ApiResponse({ status: 200, description: 'Material desactivado' })
+  @ApiResponse({ status: 404, description: 'Material no encontrado' })
   async deactivate(
     @Param(new ZodValidationPipe(IdSchema))
     param: IdDTO,

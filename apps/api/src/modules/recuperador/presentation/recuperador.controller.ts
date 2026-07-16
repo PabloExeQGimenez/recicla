@@ -31,7 +31,18 @@ import {
 } from '../presentation/schemas/list-recuperadores.schema';
 import { PaginatedResponseDTO } from '../../../shared/dtos/paginated-response.dto';
 import { PaginateResponseMapper } from 'src/shared/mappers/paginated-response.mapper';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiBearerAuth,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 
+@ApiTags('recuperadores')
+@ApiBearerAuth()
 @Controller('recuperadores')
 export class RecuperadorController {
   constructor(
@@ -44,6 +55,45 @@ export class RecuperadorController {
   ) {}
 
   @Post()
+  @ApiOperation({
+    summary: 'Crear recuperador',
+    description: 'Crea un nuevo recuperador',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          example: 'Juan',
+          description: 'Nombre del recuperador',
+        },
+        lastName: {
+          type: 'string',
+          example: 'Pérez',
+          description: 'Apellido del recuperador',
+        },
+        dni: {
+          type: 'string',
+          example: '12345678',
+          description: 'DNI (opcional)',
+        },
+        phone: {
+          type: 'string',
+          example: '1234567890',
+          description: 'Teléfono (opcional)',
+        },
+        email: {
+          type: 'string',
+          example: 'juan@email.com',
+          description: 'Email (opcional)',
+        },
+      },
+      required: ['name', 'lastName'],
+    },
+  })
+  @ApiResponse({ status: 201, description: 'Recuperador creado exitosamente' })
+  @ApiResponse({ status: 400, description: 'Datos inválidos' })
   async create(
     @Body(new ZodValidationPipe(createRecuperadorSchema))
     body: CreateRecuperadorDTO,
@@ -53,6 +103,13 @@ export class RecuperadorController {
   }
 
   @Get(':id')
+  @ApiOperation({
+    summary: 'Obtener recuperador',
+    description: 'Retorna un recuperador por su ID',
+  })
+  @ApiParam({ name: 'id', description: 'ID del recuperador' })
+  @ApiResponse({ status: 200, description: 'Recuperador encontrado' })
+  @ApiResponse({ status: 404, description: 'Recuperador no encontrado' })
   async findById(
     @Param(new ZodValidationPipe(IdSchema))
     params: IdDTO,
@@ -62,6 +119,28 @@ export class RecuperadorController {
   }
 
   @Get()
+  @ApiOperation({
+    summary: 'Listar recuperadores',
+    description: 'Retorna una lista paginada de recuperadores',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Número de página',
+    example: 1,
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Elementos por página',
+    example: 10,
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    description: 'Buscar por nombre o apellido',
+  })
+  @ApiResponse({ status: 200, description: 'Lista paginada de recuperadores' })
   async findAll(
     @Query(new ZodValidationPipe(listRecuperadoresSchema))
     query: ListRecuperadoresDTO,
@@ -73,6 +152,41 @@ export class RecuperadorController {
   }
 
   @Patch(':id')
+  @ApiOperation({
+    summary: 'Actualizar recuperador',
+    description: 'Actualiza parcialmente un recuperador',
+  })
+  @ApiParam({ name: 'id', description: 'ID del recuperador' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: {
+          type: 'string',
+          example: 'Juan',
+          description: 'Nombre del recuperador',
+        },
+        lastName: {
+          type: 'string',
+          example: 'Pérez',
+          description: 'Apellido del recuperador',
+        },
+        dni: { type: 'string', example: '12345678', description: 'DNI' },
+        phone: {
+          type: 'string',
+          example: '1234567890',
+          description: 'Teléfono',
+        },
+        email: {
+          type: 'string',
+          example: 'juan@email.com',
+          description: 'Email',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Recuperador actualizado' })
+  @ApiResponse({ status: 404, description: 'Recuperador no encontrado' })
   async update(
     @Param(new ZodValidationPipe(IdSchema))
     params: IdDTO,
@@ -87,6 +201,13 @@ export class RecuperadorController {
   }
 
   @Patch(':id/activate')
+  @ApiOperation({
+    summary: 'Activar recuperador',
+    description: 'Activa un recuperador desactivado',
+  })
+  @ApiParam({ name: 'id', description: 'ID del recuperador' })
+  @ApiResponse({ status: 200, description: 'Recuperador activado' })
+  @ApiResponse({ status: 404, description: 'Recuperador no encontrado' })
   async activate(
     @Param(new ZodValidationPipe(IdSchema))
     params: IdDTO,
@@ -98,6 +219,13 @@ export class RecuperadorController {
   }
 
   @Patch(':id/deactivate')
+  @ApiOperation({
+    summary: 'Desactivar recuperador',
+    description: 'Desactiva un recuperador',
+  })
+  @ApiParam({ name: 'id', description: 'ID del recuperador' })
+  @ApiResponse({ status: 200, description: 'Recuperador desactivado' })
+  @ApiResponse({ status: 404, description: 'Recuperador no encontrado' })
   async deactivate(
     @Param(new ZodValidationPipe(IdSchema))
     params: IdDTO,
