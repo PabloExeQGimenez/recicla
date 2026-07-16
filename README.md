@@ -1,4 +1,4 @@
-# ♻️ Recicla
+# ♻️ Recicla ![CI](https://github.com/PabloExeQGimenez/recicla/actions/workflows/ci.yml/badge.svg)
 
 Sistema web para la gestión de una cooperativa de reciclado. Permite administrar recuperadores, materiales, pesajes y solicitudes de pago de forma integral.
 
@@ -91,6 +91,14 @@ Desplegado en [Render](https://render.com) usando `render.yaml` como blueprint:
 - **API:** Dockerfile multi-stage → Node 22 Alpine → Prisma migrate + seed al arranque
 - **Frontend:** Build estático servido con Nginx
 - **Base de datos:** PostgreSQL managed en Render (plan free)
+
+## ⚙️ CI/CD
+
+Pipeline de [GitHub Actions](.github/workflows/ci.yml) que se ejecuta en cada PR y push a `main`:
+
+- **quality** — lint y build del monorepo
+- **test-frontend** — tests del frontend con Vitest
+- **test-api** — tests del backend con Jest + PostgreSQL
 
 ## 👨‍💻 Autor
 
