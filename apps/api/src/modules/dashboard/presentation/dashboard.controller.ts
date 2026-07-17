@@ -1,4 +1,5 @@
 import { Controller, Get, Query } from '@nestjs/common';
+import { SkipThrottle } from '@nestjs/throttler';
 import { ZodValidationPipe } from 'src/shared/pipes/zod-validation.pipe';
 import {
   DashboardQuerySchema,
@@ -8,6 +9,7 @@ import { GetDashboardDataUseCase } from '../application/get-dashboard-data.useca
 import type { DashboardData } from '@recicla/shared';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 
+@SkipThrottle()
 @ApiTags('dashboard')
 @Controller('dashboard')
 export class DashboardController {
