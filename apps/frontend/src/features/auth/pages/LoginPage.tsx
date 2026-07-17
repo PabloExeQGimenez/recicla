@@ -6,8 +6,8 @@ import { Button } from "../../../shared/UI";
 import Logo from "../../../assets/images/logoFondo.png";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("admin@demo.com");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("admin@recicla.com");
+  const [password, setPassword] = useState("admin123");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [showPwd, setShowPwd] = useState(false);
